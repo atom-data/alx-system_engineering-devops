@@ -1,0 +1,9 @@
+Host *
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
+	
+Host 54449-web-01
+	Hostname 100.25.140.89
+	User ubuntu
+	IdentityFile ~/.ssh/school
+	strictHostKeyChecking ask	
