@@ -2,7 +2,7 @@ Host *
 	PasswordAuthentication yes
 	
 Host 54449-web-01
-	Hostname 100.25.140.89
+	Hostname 100.25.162.216
 	User ubuntu
 	PubKeyAuthentication yes
 	IdentityFile ~/.ssh/school
