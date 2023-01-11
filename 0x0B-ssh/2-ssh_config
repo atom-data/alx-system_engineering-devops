@@ -4,5 +4,7 @@ Host *
 Host 54449-web-01
 	Hostname 100.25.140.89
 	User ubuntu
+	PubKeyAuthentication yes
 	IdentityFile ~/.ssh/school
+	IdentitiesOnly yes
 	PasswordAuthentication no	
