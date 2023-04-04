@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Create a custom http response header
+sudo sed -i "/^[^#]*server {/,/^}$/ s/^\( *\)\(server {\)$/\1\2\n\1\tadd_header X-Served-By $HOSTNAME;/" /etc/nginx/sites-available/default
+sudo nginx -t
+sudo service nginx restart
