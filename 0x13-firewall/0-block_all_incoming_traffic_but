@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Install and setup firewall on the server
+sudo apt-get update
+sudo apt-get install -y ufw
+
+sudo ufw default deny incoming			# Setting up default policies
+sudo ufw default allow outgoing
+
+sudo ufw allow ssh			# Allowing SSH Connections
+sudo ufw allow http			# Allowing http Connections
+sudo ufw allow https			# Allowing https Connections
+
+echo "y" | sudo ufw enable			# Enabling UFW
+sudo ufw status verbose			# Confirm the rules are set
