@@ -3,7 +3,7 @@
 
 print_info ()
 {
-  if [ -z "$2" ]
+  if [ -z "$2" ];
   then
      for var in www lb-01 web-01 web-02;
      do
@@ -12,7 +12,8 @@ print_info ()
       record_type=$(dig $subdomain | grep -A1 'ANSWER SECTION:' | awk 'NR==2 {print $4}')
       echo "This subdomain $var is a $record_type record and points to $destination"
      done
-  else
+  elif [ -n "$2" ];
+  then
     subdomain="$2.$1"
     destination=$(dig $subdomain | grep -A1 'ANSWER SECTION:' | awk 'NR==2 {print $5}')
     record_type=$(dig $subdomain | grep -A1 'ANSWER SECTION:' | awk 'NR==2 {print $4}')
@@ -20,4 +21,7 @@ print_info ()
   fi
 }
 
-print_info $1 $2
+if [ -n "$1" ]
+then
+  print_info $1 $2
+fi
