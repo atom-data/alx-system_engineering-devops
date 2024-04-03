@@ -1,38 +1,49 @@
 #!/usr/bin/python3
-"""For a given employee ID, returns TODO list info"""
+
+"""
+Find an employee's todo list progress
+"""
 
 if __name__ == "__main__":
-    """ __main__ """
+        import requests
+        import sys
 
-    import json
-    import requests
-    import sys
+        if len(sys.argv) < 2:
+                exit()
+        try:
+                employee_id = int(sys.argv[1])
+        except ValueError:
+                print("Employee ID must be an integer.")
+                exit()
+        url = "https://jsonplaceholder.typicode.com/"
+        users_url = url + "users?id={}".format(employee_id)
+        todos_url = url + "todos?userId={}".format(employee_id)
+        completed_url = todos_url + "&completed=true"
 
-    if len(sys.argv) != 2:
-        exit(1)
+        # json output
+        def response_json(input_url):
+                try:
+                        input_response = requests.get(input_url, verify=False)
+                        input_response.raise_for_status()
+                        return input_response.json()
+                except requests.exceptions.RequestException as e:
+                        print(e)
 
-    empID = sys.argv[1]
-    url = 'https://jsonplaceholder.typicode.com/'
+        # Get employee's details
+        employee_details = response_json(users_url)
+        employee_name = employee_details[0].get('name')
 
-    url_empID = url + 'users/' + str(empID)
-    user = requests.get(url_empID).json()
+        # Total number of tasks todo
+        todos_detail = response_json(todos_url)
+        total_tasks_done = len(todos_detail)
 
-    if (len(user) == 0):
-        exit(1)
+        # Number of tasks done
+        completed_tasks = response_json(completed_url)
+        total_completed_tasks = len(completed_tasks)
 
-    empName = user.get("name")
-
-    url_TodoCompleted = url + 'todos?userId=' + empID + '&completed=true'
-    t = requests.get(url_TodoCompleted)
-    tJson = t.json()
-    nTodoDone = len(tJson)
-
-    url_TodoTotal = url + 'todos?userId=' + empID
-    tot = requests.get(url_TodoTotal)
-    totJson = tot.json()
-    nTodo = len(totJson)
-
-    print("Employee {} is done with tasks({}/{}):".format(
-        empName, nTodoDone, nTodo))
-    for i in range(nTodoDone):
-        print("\t {}".format(tJson[i].get("title")))
+        print("Employee {} is done with tasks ({}/{})".format(
+            employee_name,
+            total_completed_tasks,
+            total_tasks_done))
+        for task in completed_tasks:
+            print("\t {}".format(task.get('title')))
