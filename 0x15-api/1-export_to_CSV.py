@@ -1,32 +1,56 @@
 #!/usr/bin/python3
-"""For a given employee ID, returns TODO list info as CSV format"""
+"""
+Export todo list info to csv
+"""
+
 if __name__ == "__main__":
-    """ __main__ """
-
     import csv
-    import sys
     import requests
+    import sys
 
-    if len(sys.argv) != 2:
-        exit(1)
+    if len(sys.argv) < 2:
+        exit()
+    try:
+        user_id = int(sys.argv[1])
+    except ValueError:
+        print("Employee ID must be an integer.")
+        exit()
+    url = "https://jsonplaceholder.typicode.com/"
+    users_url = url + "users?id={}".format(user_id)
+    todos_url = url + "todos?userId={}".format(user_id)
 
-    url = 'https://jsonplaceholder.typicode.com/'
-    empID = sys.argv[1]
+    # json output
+    def response_json(input_url):
+        try:
+            input_response = requests.get(input_url, verify=False)
+            input_response.raise_for_status()
+            return input_response.json()
+        except requests.exceptions.RequestException as e:
+            print(e)
+        except IndexError:
+            print("Error: No employee found with ID {}".format(
+                user_id))
 
-    urlUser = url + 'users/' + empID
-    urlTodos = url + 'todos?userId=' + empID
+    # Get employee details
+    employee_details = response_json(users_url)
+    user_name = employee_details[0].get('username')
 
-    user = requests.get(urlUser).json()
-    todos = requests.get(urlTodos).json()
+    # employee todo tasks
+    todos_details = response_json(todos_url)
 
-    if (len(user) == 0):
-        exit(1)
+    # combine the data
+    combined_data = []
+    for todos_data in todos_details:
+        combined_entry = {"userName": user_name}
+        combined_entry.update(todos_data)
+        combined_data.append(combined_entry)
 
-    username = user.get("username")
+    # csv file name
+    csv_file = "{}.csv".format(user_id)
 
-    fp = empID + ".csv"
-    with open(fp, "w") as csvFile:
-        csvWriter = csv.writer(csvFile, quoting=csv.QUOTE_ALL)
-        for todo in todos:
-            csvWriter.writerow(
-                [empID, username, todo.get("completed"), todo.get("title")])
+    # write csv
+    with open(csv_file, 'w', newline='') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        for line in combined_data:
+            writer.writerow([line.get("userId"), line.get(
+                "userName"), line.get("completed"), line.get("title")])
